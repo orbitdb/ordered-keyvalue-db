@@ -1,60 +1,26 @@
-# Kuiper
-Additional database types for orbit-db.
+# @orbitdb/ordered-keyvalue-db
+Ordered keyvalue database type for orbit-db.
 
-[![Orbit-db Kuiper tests](https://github.com/reseau-constellation/orbit-db-kuiper/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/reseau-constellation/orbit-db-kuiper/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/reseau-constellation/orbit-db-kuiper/graph/badge.svg?token=7OZK4BJDej)](https://codecov.io/gh/reseau-constellation/orbit-db-kuiper)
+[![Tests](https://github.com/orbitdb/ordered-keyvalue/actions/workflows/run-test.yml/badge.svg?branch=main)](https://github.com/orbitdb/ordered-keyvalue/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/orbitdb/ordered-keyvalue/graph/badge.svg?token=7OZK4BJDej)](https://codecov.io/gh/orbitdb/ordered-keyvalue)
 
 ## Installation
 ```
-$ pnpm add @constl/orbit-db-kuiper
+$ pnpm add @orbitdb/ordered-keyvalue
 ```
 ## Introduction
-`Kuiper` brings additional database types to `orbit-db`.
-
-* `Feed`: For those feeling nostalgic for orbit-db v.0.x. But honestly, you're probably better off with a `KeyValue` or a `Set`.
-* `Set`: Like `Feed`, but each value can only be present once. Works for primitive types as well as more complex objects.
-* `OrderedKeyValue`: A `KeyValue` database where you can move entries around. Ideal for situations where order is important (e.g., lists of tabs in a spreadsheet, etc.). 
+A `KeyValue` database where you can move entries around. Ideal for situations where order is important (e.g., lists of tabs in a spreadsheet, etc.). 
 
 ## Examples
 
-### Set
-As simple example with `Set`:
 ```ts
 import { createOrbit } from "@orbitdb/core";
-import { registerAll } from "@constl/orbit-db-kuiper";
+import { registerOrderedKeyValue } from "@orbitdb/ordered-keyvalue";
 
-// Register Kuiper database types. IMPORTANT - must call before creating orbit instance !
-registerAll();
+// Register database type. IMPORTANT - must call before creating orbit instance !
+registerOrderedKeyValue();
 
 const orbit = await createOrbit({ ipfs })
-
-const db = await orbit.open({ type: "set" });
-
-await db.add(1);
-await db.add(2);
-
-const all = await db.all();  // [1, 2]
-
-await db.add(1);
-await db.all()  // Yay !! Still [1, 2]
-```
-
-### Feed
-```ts
-const db = await orbit.open({ type: "feed" });
-
-await db.add({ a: 1, b: "c" });
-
-const all = await db.all();  // [{ value: { a: 1, b: "c" }, hash: "..." }]
-
-await db.add({ a: 1, b: "c" });
-await db.all();  
-// [{ value: { a: 1, b: "c" }, hash: "..." }, { value: { a: 1, b: "c" }, hash: "..." }]
-```
-
-### OrderedKeyValue
-
-```ts
 
 const db = await orbit.open({ type: "ordered-keyvalue" });
 

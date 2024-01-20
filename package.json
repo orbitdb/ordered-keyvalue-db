@@ -1,5 +1,5 @@
 {
-  "name": "@orbitdb/ordered-keyvalue",
+  "name": "@orbitdb/ordered-keyvalue-db",
   "version": "1.0.0",
   "description": "Ordered keyvalue database type for orbit-db.",
   "author": "Julien Jean Malard-Adam",
@@ -17,7 +17,9 @@
   "scripts": {
     "clean": "rimraf dist",
     "compile": "pnpm updateVersion && pnpm format && pnpm clean && pnpm tspc -p tsconfig.build.json",
-    "test": "pnpm compile && pnpm aegir test -t node --cov -- --exit",
+    "test": "pnpm test:node && pnpm test:browser",
+    "test:node": "pnpm compile && pnpm aegir test -t node --cov -- --exit",
+    "test:browser": "pnpm compile && pnpm aegir test -t browser --cov -- --exit",
     "format": "pnpm prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\" && pnpm eslint --ext .js,.ts src",
     "release": "pnpm test && (git commit -a -m 'version' || true) && pnpm publish",
     "updateVersion": "pnpm genversion  --es6 --semi src/version.ts"
@@ -36,7 +38,6 @@
     "@libp2p/identify": "^1.0.11",
     "@libp2p/webrtc": "^4.0.16",
     "@libp2p/websockets": "^8.0.12",
-    "@types/fs-extra": "^11.0.4",
     "@types/mocha": "^10.0.6",
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
@@ -44,22 +45,17 @@
     "aegir": "^42.2.2",
     "blockstore-core": "^4.3.10",
     "blockstore-level": "^1.1.7",
-    "browserify-fs": "^1.0.0",
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "fs-extra": "^11.2.0",
     "genversion": "^3.2.0",
     "libp2p": "^1.2.0",
     "mocha": "^10.2.0",
-    "os-browserify": "^0.3.0",
     "prettier": "^3.2.4",
-    "process": "^0.11.10",
     "rimraf": "^5.0.5",
     "ts-patch": "^3.1.2",
     "typescript": "^5.3.3",
-    "typescript-transform-paths": "^3.4.6"
+    "typescript-transform-paths": "^3.4.6",
+    "wherearewe": "^2.0.1"
   },
   "jest": {
     "transform": {

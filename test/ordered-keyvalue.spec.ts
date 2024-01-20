@@ -1,14 +1,15 @@
-import { deepStrictEqual, strictEqual, notStrictEqual } from "assert";
 import { type Helia } from "helia";
-import { rimraf } from "rimraf";
 
+import { Identities, Identity, KeyStore, KeyStoreType } from "@orbitdb/core";
 import OrderedKeyValue, {
   OrderedKeyValueDatabaseType,
 } from "@/ordered-keyvalue.js";
-import { createTestHelia } from "./config.js";
-import { Identities, Identity, KeyStore, KeyStoreType } from "@orbitdb/core";
-import { expect } from "aegir/chai";
 import { DBElements } from "@/types.js";
+import { createTestHelia } from "./config.js";
+import { isBrowser } from "wherearewe";
+import { expect } from "aegir/chai";
+
+const rimrafImport = import("rimraf");
 
 const keysPath = "./testkeys";
 
@@ -38,9 +39,12 @@ describe("OrderedKeyValue Database", () => {
       await keystore.close();
     }
 
-    await rimraf(keysPath);
-    await rimraf("./orbitdb");
-    await rimraf("./ipfsOKV");
+    if (!isBrowser) {
+      const { rimraf } = await rimrafImport;
+      await rimraf(keysPath);
+      await rimraf("./orbitdb");
+      await rimraf("./ipfsOKV");
+    }
   });
 
   describe("Creating an Ordered KeyValue database", () => {
@@ -60,8 +64,8 @@ describe("OrderedKeyValue Database", () => {
     });
 
     it("creates an ordered-keyvalue store", async () => {
-      strictEqual(db.address.toString(), databaseId);
-      strictEqual(db.type, "ordered-keyvalue");
+      expect(db.address.toString()).to.equal(databaseId);
+      expect(db.type).to.equal("ordered-keyvalue");
     });
 
     it("returns 0 items when it's a fresh database", async () => {
@@ -70,7 +74,7 @@ describe("OrderedKeyValue Database", () => {
         all.unshift(item);
       }
 
-      strictEqual(all.length, 0);
+      expect(all.length).to.equal(0);
     });
   });
 
@@ -356,7 +360,7 @@ describe("OrderedKeyValue Database", () => {
         all.unshift(pair);
       }
 
-      deepStrictEqual(all, keyvalue);
+      expect(all).to.deep.equal(keyvalue);
     });
   });
 
@@ -377,8 +381,8 @@ describe("OrderedKeyValue Database", () => {
     });
 
     it("has an iterator function", async () => {
-      notStrictEqual(db.iterator, undefined);
-      strictEqual(typeof db.iterator, "function");
+      expect(db.iterator).to.not.be.undefined();
+      expect(typeof db.iterator).to.equal("function");
     });
 
     it("returns no values when the database is empty", async () => {
@@ -386,7 +390,7 @@ describe("OrderedKeyValue Database", () => {
       for await (const { hash, value, key } of db.iterator()) {
         all.unshift({ hash, value, key });
       }
-      strictEqual(all.length, 0);
+      expect(all.length).to.equal(0);
     });
 
     it("returns all values when the database is not empty", async () => {
@@ -410,7 +414,7 @@ describe("OrderedKeyValue Database", () => {
         all.unshift({ hash, value, position });
         position++;
       }
-      strictEqual(all.length, 5);
+      expect(all.length).to.equal(5);
     });
 
     it("returns only the amount of values given as a parameter", async () => {
@@ -419,7 +423,7 @@ describe("OrderedKeyValue Database", () => {
       for await (const { hash, value } of db.iterator({ amount })) {
         all.unshift({ hash, value });
       }
-      strictEqual(all.length, amount);
+      expect(all.length).to.equal(amount);
     });
 
     it("returns only two values if amount given as a parameter is 2", async () => {
@@ -428,7 +432,7 @@ describe("OrderedKeyValue Database", () => {
       for await (const { hash, value } of db.iterator({ amount })) {
         all.unshift({ hash, value });
       }
-      strictEqual(all.length, amount);
+      expect(all.length).to.equal(amount);
     });
 
     it("returns only one value if amount given as a parameter is 1", async () => {
@@ -437,7 +441,7 @@ describe("OrderedKeyValue Database", () => {
       for await (const { hash, value } of db.iterator({ amount })) {
         all.unshift({ hash, value });
       }
-      strictEqual(all.length, amount);
+      expect(all.length).to.equal(amount);
     });
   });
 });

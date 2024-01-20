@@ -1,4 +1,4 @@
-name: Orbit-db Kuiper tests
+name: orbit-db-ordered-keyvalue tests
 on:
   push:
     branches:
@@ -7,14 +7,14 @@ on:
     branches:
       - main
 jobs:
-  tests-et-couverture:
+  test-node:
     name: Node.js test
     runs-on: ubuntu-latest
     steps:
       - name: Préparation de Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 21
 
       - name: Installer pnpm
         uses: pnpm/action-setup@v2.4.0
@@ -28,7 +28,7 @@ jobs:
         run: pnpm install --lockfile=false
 
       - name: Vérifier les tests
-        run: pnpm test
+        run: pnpm test:node
 
       - name: Envoyer couverture à Codecov
         uses: codecov/codecov-action@v3
