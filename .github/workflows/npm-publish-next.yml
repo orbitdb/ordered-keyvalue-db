@@ -15,11 +15,18 @@ jobs:
         with:
           node-version: 'lts/*'
           registry-url: https://registry.npmjs.org/
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.4.0
+        with:
+          version: latest
       - run: pnpm install
       - run: pnpm test
+      - run: git config --global user.email "bot@example.com"
+      - run: git config --global user.name "Github Action"
       - run: |
           pnpm version prerelease --no-git-tag-version \
             --preid=`git rev-parse --short HEAD`
+          git commit package.json -m "next tag"
           pnpm publish --tag next
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
