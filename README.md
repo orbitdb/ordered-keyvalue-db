@@ -1,8 +1,8 @@
 # @orbitdb/ordered-keyvalue-db
 Ordered keyvalue database type for orbit-db.
 
-[![Tests](https://github.com/orbitdb/ordered-keyvalue/actions/workflows/run-test.yml/badge.svg?branch=main)](https://github.com/orbitdb/ordered-keyvalue/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/orbitdb/ordered-keyvalue/graph/badge.svg?token=7OZK4BJDej)](https://codecov.io/gh/orbitdb/ordered-keyvalue)
+[![Tests](https://github.com/orbitdb/ordered-keyvalue-db/actions/workflows/run-test.yml/badge.svg?branch=main)](https://github.com/orbitdb/ordered-keyvalue-db/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/orbitdb/ordered-keyvalue-db/graph/badge.svg?token=7OZK4BJDej)](https://codecov.io/gh/orbitdb/ordered-keyvalue-db)
 
 ## Installation
 ```
