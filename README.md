@@ -6,7 +6,7 @@ Ordered keyvalue database type for orbit-db.
 
 ## Installation
 ```
-$ pnpm add @orbitdb/ordered-keyvalue
+$ pnpm add @orbitdb/ordered-keyvalue-db
 ```
 ## Introduction
 A `KeyValue` database where you can move entries around. Ideal for situations where order is important (e.g., lists of tabs in a spreadsheet, etc.). 
@@ -15,7 +15,7 @@ A `KeyValue` database where you can move entries around. Ideal for situations wh
 
 ```ts
 import { createOrbit } from "@orbitdb/core";
-import { registerOrderedKeyValue } from "@orbitdb/ordered-keyvalue";
+import { registerOrderedKeyValue } from "@orbitdb/ordered-keyvalue-db";
 
 // Register database type. IMPORTANT - must call before creating orbit instance !
 registerOrderedKeyValue();
