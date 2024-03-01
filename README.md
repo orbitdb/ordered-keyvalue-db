@@ -1,5 +1,5 @@
 # @orbitdb/ordered-keyvalue-db
-Ordered keyvalue database type for orbit-db.
+Ordered keyvalue database type for OrbitDB.
 
 [![Tests](https://github.com/orbitdb/ordered-keyvalue-db/actions/workflows/run-test.yml/badge.svg?branch=main)](https://github.com/orbitdb/ordered-keyvalue-db/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/orbitdb/ordered-keyvalue-db/graph/badge.svg?token=7OZK4BJDej)](https://codecov.io/gh/orbitdb/ordered-keyvalue-db)
@@ -14,13 +14,13 @@ A `KeyValue` database where you can move entries around. Ideal for situations wh
 ## Examples
 
 ```ts
-import { createOrbit } from "@orbitdb/core";
+import { createOrbitDB } from "@orbitdb/core";
 import { registerOrderedKeyValue } from "@orbitdb/ordered-keyvalue-db";
 
 // Register database type. IMPORTANT - must call before creating orbit instance !
 registerOrderedKeyValue();
 
-const orbit = await createOrbit({ ipfs })
+const orbit = await createOrbitDB({ ipfs })
 
 const db = await orbit.open({ type: "ordered-keyvalue" });
 
