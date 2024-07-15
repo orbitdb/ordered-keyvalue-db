@@ -4,7 +4,7 @@ import {
   type Identity,
   type Storage,
 } from "@orbitdb/core";
-import type { Helia } from "helia";
+import type { HeliaLibp2p } from "helia";
 
 export type OrderedKeyValueDatabaseType = Awaited<
   ReturnType<ReturnType<typeof OrderedKeyValue>>
@@ -29,7 +29,7 @@ const OrderedKeyValue =
     syncAutomatically,
     onUpdate,
   }: {
-    ipfs: Helia;
+    ipfs: HeliaLibp2p;
     identity?: Identity;
     address: string;
     name?: string;

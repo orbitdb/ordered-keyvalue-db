@@ -1,4 +1,4 @@
-import { type Helia } from "helia";
+import { type HeliaLibp2p } from "helia";
 
 import { Identities, Identity, KeyStore, KeyStoreType } from "@orbitdb/core";
 import OrderedKeyValue, {
@@ -9,12 +9,10 @@ import { createTestHelia } from "./config.js";
 import { isBrowser } from "wherearewe";
 import { expect } from "aegir/chai";
 
-const rimrafImport = import("rimraf");
-
 const keysPath = "./testkeys";
 
 describe("OrderedKeyValue Database", () => {
-  let ipfs: Helia;
+  let ipfs: HeliaLibp2p;
   let identities;
   let keystore: KeyStoreType;
   let testIdentity1: Identity;
@@ -40,7 +38,7 @@ describe("OrderedKeyValue Database", () => {
     }
 
     if (!isBrowser) {
-      const { rimraf } = await rimrafImport;
+      const { rimraf } = await import("rimraf");
       await rimraf(keysPath);
       await rimraf("./orbitdb");
       await rimraf("./ipfsOKV");
