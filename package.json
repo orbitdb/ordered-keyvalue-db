@@ -1,6 +1,6 @@
 {
   "name": "@orbitdb/ordered-keyvalue-db",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ordered keyvalue database type for orbit-db.",
   "author": "Julien Jean Malard-Adam",
   "keywords": [
@@ -10,18 +10,19 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./dist/src/index.js",
+  "main": "./dist/index.js",
   "type": "module",
-  "types": "./dist/src/index.d.ts",
-  "exports": "./dist/src/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": "./dist/index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "compile": "pnpm updateVersion && pnpm format && pnpm clean && pnpm tspc -p tsconfig.build.json",
+    "compile": "pnpm tspc -p tsconfig.json",
+    "compile:prod": "pnpm updateVersion && pnpm format && pnpm clean && pnpm tspc -p tsconfig.build.json",
     "test": "pnpm test:node && pnpm test:browser",
     "test:node": "pnpm compile && pnpm aegir test -t node --cov -- --exit",
     "test:browser": "pnpm compile && pnpm aegir test -t browser --cov -- --exit",
     "format": "pnpm prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\" && pnpm eslint",
-    "release": "pnpm test && (git commit -a -m 'version' || true) && pnpm publish",
+    "release": "pnpm test && pnpm compile:prod && (git commit -a -m 'version' || true) && pnpm publish",
     "updateVersion": "pnpm genversion  --es6 --semi src/version.ts"
   },
   "dependencies": {
@@ -33,15 +34,13 @@
     "@chainsafe/libp2p-noise": "^15.1.0",
     "@chainsafe/libp2p-yamux": "^6.0.2",
     "@constl/orbit-db-types": "^2.0.0",
+    "@eslint/js": "^9.7.0",
     "@helia/block-brokers": "^3.0.2",
     "@libp2p/circuit-relay-v2": "^1.1.2",
     "@libp2p/identify": "^2.1.2",
     "@libp2p/webrtc": "^4.1.2",
     "@libp2p/websockets": "^8.1.2",
     "@types/mocha": "^10.0.7",
-    "@types/uuid": "^9.0.8",
-    "@typescript-eslint/eslint-plugin": "^7.16.0",
-    "@typescript-eslint/parser": "^7.16.0",
     "aegir": "^44.0.1",
     "blockstore-core": "^4.4.1",
     "blockstore-level": "^1.1.8",
@@ -54,6 +53,7 @@
     "rimraf": "^6.0.1",
     "ts-patch": "^3.2.1",
     "typescript": "^5.5.3",
+    "typescript-eslint": "^7.16.0",
     "typescript-transform-paths": "^3.4.7",
     "wherearewe": "^2.0.1"
   },
