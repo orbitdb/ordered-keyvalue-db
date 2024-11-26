@@ -3,6 +3,8 @@ import {
   Database,
   type Identity,
   type Storage,
+  type MetaData,
+  type DagCborEncodable,
 } from "@orbitdb/core";
 import type { HeliaLibp2p } from "helia";
 
@@ -35,7 +37,7 @@ const OrderedKeyValue =
     name?: string;
     access?: AccessController;
     directory?: string;
-    meta?: object;
+    meta?: MetaData;
     headsStorage?: Storage;
     entryStorage?: Storage;
     indexStorage?: Storage;
@@ -63,10 +65,12 @@ const OrderedKeyValue =
 
     const put = async (
       key: string,
-      value: unknown,
+      value: DagCborEncodable,
       position?: number,
     ): Promise<string> => {
-      const entryValue: { value: unknown; position?: number } = { value };
+      const entryValue: { value: DagCborEncodable; position?: number } = {
+        value,
+      };
       if (position !== undefined) {
         entryValue.position = position;
       }
