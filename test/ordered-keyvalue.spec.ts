@@ -341,7 +341,7 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
-    it.skip("move a value twice", async () => {
+    it("move a value twice", async () => {
       const value = "value1";
       const key = "key1";
 
