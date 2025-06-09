@@ -378,49 +378,41 @@ describe("OrderedKeyValue Database", () => {
         value: DBElements;
         key: string;
         position: number;
-        clock: number;
         hash?: string;
       }[] = [
         {
           key: "key1",
           position: 0,
-          clock: -6,
           value: "init",
         },
         {
           key: "key2",
           position: 1,
-          clock: -5,
           value: true,
         },
         {
           key: "key3",
           position: 2,
-          clock: -4,
           value: "hello",
         },
         {
           key: "key4",
           position: 3,
-          clock: -3,
           value: "friend",
         },
         {
           key: "key5",
           position: 4,
-          clock: -2,
           value: "12345",
         },
         {
           key: "key6",
           position: 5,
-          clock: -1,
           value: "empty",
         },
         {
           key: "key7",
           position: 6,
-          clock: 0,
           value: "friend33",
         },
       ];
@@ -431,7 +423,7 @@ describe("OrderedKeyValue Database", () => {
 
       const all = [];
       for await (const pair of db.iterator()) {
-        all.unshift(pair);
+        all.push(pair);
       }
 
       expect(all).to.deep.equal(keyvalue);

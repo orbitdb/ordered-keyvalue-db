@@ -107,80 +107,84 @@ const OrderedKeyValue =
         key: string;
         value: unknown;
         position: number;
-        clock: number;
         hash: string;
       },
       void,
       unknown
     > {
-      const keys: { [key: string]: boolean } = {};
-      const positions: { [key: string]: {position: number; clock: number } } = {};
-
       let count = 0;
-      let clock = 0;
+      const orderedLogEntries: LogEntry<DagCborEncodable>[] = [];
       for await (const entry of log.traverse()) {
+        orderedLogEntries.unshift(entry)
+      };
+
+      let finalEntries: {key: string; value: unknown; position: number, hash: string}[] = []
+      for (const entry of orderedLogEntries) {
         const { op, key, value } = entry.payload;
         if (!key) return;
 
-        if (op === "PUT" && !keys[key]) {
-          keys[key] = true;
+        if (op === "PUT") {
+          finalEntries = finalEntries.filter(e=>e.key !== key);
+
           const putValue = value as { value: unknown; position?: number };
 
           const hash = entry.hash;
 
-          const position =
-            positions[key] !== undefined
-              ? positions[key]
-              : putValue.position !== undefined
-                ? {position: putValue.position, clock}
-                : {position: -1, clock};
-          positions[key] = position;
-
-          count++;
-          clock--;
-          yield { key, value: putValue.value, ...position, hash };
-        } else if (op === "MOVE" && !keys[key] && !positions[key]) {  // À faire ici
-          positions[key] = {position: value as number, clock};
-          clock--;
-        } else if (op === "DEL" && !keys[key]) {
-          keys[key] = true;
+          const position = putValue.position !== undefined ? putValue.position : -1;
+          finalEntries.push({
+            key,
+            value: putValue.value,
+            position,
+            hash
+          });
+          count++
+        } else if (op === "MOVE") {
+          const existingEntry = finalEntries.find(e=>e.key === key);
+          if (existingEntry) {
+            existingEntry.position = value as number;
+            finalEntries = [...finalEntries.filter(e=>e.key !== key), existingEntry]
+          }
+        } else if (op === "DEL") {
+          finalEntries = finalEntries.filter(e=>e.key !== key);
         }
         if (amount !== undefined && count >= amount) {
           break;
         }
       }
+
+      // This is memory inefficient, but I haven't been able to think of a more elegant solution
+      for (const entry of finalEntries) {
+        yield entry;
+      }
     };
 
     const all = async () => {
-      const values: {
+      const entries: {
         key: string;
         value: unknown;
         hash: string;
         position: number;
-        clock: number;
       }[] = [];
       for await (const entry of iterator()) {
-        values.unshift(entry);
+        entries.push(entry)
       }
-      const nonNegativePositionValues = values.map(
-        v => ({
-          ...v,
-          position: v.position >= 0 ? v.position : values.length + (v.position)
-        })
-      )
 
-      return nonNegativePositionValues
-        .sort((a, b) =>{
-          return a.position > b.position ? 1 : a.position === b.position ? (
-            a.clock - b.clock
-          ) : -1
-        }
-        )
-        .map((v) => ({
-          key: v.key,
-          value: v.value,
-          hash: v.hash,
-        }));
+      const values: {
+        key: string;
+        value: unknown;
+        hash: string;
+      }[] = [];
+
+      for (const entry of entries) {
+        const position = entry.position >= 0 ? entry.position : (entries.length + entry.position + 1)
+        values.splice(position, 0, {
+          key: entry.key,
+          value: entry.value,
+          hash: entry.hash,
+        })
+      }
+      
+      return values;
     };
 
     return {
