@@ -168,7 +168,6 @@ const OrderedKeyValue =
           position: v.position >= 0 ? v.position : values.length + (v.position)
         })
       )
-      console.log(nonNegativePositionValues)
 
       return nonNegativePositionValues
         .sort((a, b) =>{
