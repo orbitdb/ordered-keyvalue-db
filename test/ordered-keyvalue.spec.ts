@@ -174,6 +174,24 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
+    it("add a value - index 0", async () => {
+      const value = "value1";
+      const key = "key1";
+
+      const value2 = "value2";
+      const key2 = "key2";
+
+      const hash = await db.put(key, value);
+      const hash2 = await db.put(key2, value2, 0);
+
+      const actual = await db.all();
+
+      expect(actual).to.deep.equal([
+        { value: value2, key: key2, hash: hash2 },
+        { value: value, key, hash },
+      ]);
+    });
+
     it("add a value - negative index", async () => {
       const value = "value1";
       const key = "key1";
@@ -187,8 +205,8 @@ describe("OrderedKeyValue Database", () => {
       const actual = await db.all();
 
       expect(actual).to.deep.equal([
-        { value: value2, key: key2, hash: hash2 },
         { value: value, key, hash },
+        { value: value2, key: key2, hash: hash2 },
       ]);
     });
 
@@ -228,6 +246,24 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
+    it("move a value - index 0", async () => {
+      const value = "value1";
+      const key = "key1";
+
+      const value2 = "value2";
+      const key2 = "key2";
+
+      const hash = await db.put(key, value);
+      const hash2 = await db.put(key2, value2);
+      await db.move(key2, 0);
+      const actual = await db.all();
+
+      expect(actual).to.deep.equal([
+        { value: value2, key: key2, hash: hash2 },
+        { value: value, key, hash },
+      ]);
+    });
+
     it("move a value - negative index", async () => {
       const value = "value1";
       const key = "key1";
@@ -237,7 +273,7 @@ describe("OrderedKeyValue Database", () => {
 
       const hash = await db.put(key, value);
       const hash2 = await db.put(key2, value2);
-      await db.move(key2, -1);
+      await db.move(key, -1);
       const actual = await db.all();
 
       expect(actual).to.deep.equal([
@@ -305,46 +341,86 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
+    it.skip("move a value twice", async () => {
+      const value = "value1";
+      const key = "key1";
+
+      const value2 = "value2";
+      const key2 = "key2";
+
+      const value3 = "value3";
+      const key3 = "key3";
+
+      const hash = await db.put(key, value);
+      const hash2 = await db.put(key2, value2);
+      const hash3 = await db.put(key3, value3);
+      await db.move(key, 1);
+      
+      const actual1 = await db.all();
+      expect(actual1).to.deep.equal([
+        { value: value2, key: key2, hash: hash2 },
+        { value: value, key, hash },
+        { value: value3, key: key3, hash: hash3 },
+      ]);
+
+      await db.move(key, 2);
+      
+      const actual2 = await db.all();
+      expect(actual2).to.deep.equal([
+        { value: value2, key: key2, hash: hash2 },
+        { value: value3, key: key3, hash: hash3 },
+        { value: value, key, hash },
+      ]);
+    });
+
     it("returns all values", async () => {
       const keyvalue: {
         value: DBElements;
         key: string;
         position: number;
+        clock: number;
         hash?: string;
       }[] = [
         {
           key: "key1",
           position: 0,
+          clock: -6,
           value: "init",
         },
         {
           key: "key2",
           position: 1,
+          clock: -5,
           value: true,
         },
         {
           key: "key3",
           position: 2,
+          clock: -4,
           value: "hello",
         },
         {
           key: "key4",
           position: 3,
+          clock: -3,
           value: "friend",
         },
         {
           key: "key5",
           position: 4,
+          clock: -2,
           value: "12345",
         },
         {
           key: "key6",
           position: 5,
+          clock: -1,
           value: "empty",
         },
         {
           key: "key7",
           position: 6,
+          clock: 0,
           value: "friend33",
         },
       ];

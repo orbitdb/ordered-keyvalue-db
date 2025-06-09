@@ -5,6 +5,7 @@ import {
   type Storage,
   type MetaData,
   type DagCborEncodable,
+  type LogEntry,
 } from "@orbitdb/core";
 import type { HeliaLibp2p } from "helia";
 
@@ -106,15 +107,17 @@ const OrderedKeyValue =
         key: string;
         value: unknown;
         position: number;
+        clock: number;
         hash: string;
       },
       void,
       unknown
     > {
       const keys: { [key: string]: boolean } = {};
-      const positions: { [key: string]: number } = {};
+      const positions: { [key: string]: {position: number; clock: number } } = {};
 
       let count = 0;
+      let clock = 0;
       for await (const entry of log.traverse()) {
         const { op, key, value } = entry.payload;
         if (!key) return;
@@ -129,14 +132,16 @@ const OrderedKeyValue =
             positions[key] !== undefined
               ? positions[key]
               : putValue.position !== undefined
-                ? putValue.position
-                : 0;
+                ? {position: putValue.position, clock}
+                : {position: -1, clock};
           positions[key] = position;
 
           count++;
-          yield { key, value: putValue.value, position, hash };
-        } else if (op === "MOVE" && !keys[key]) {
-          positions[key] = value as number;
+          clock--;
+          yield { key, value: putValue.value, ...position, hash };
+        } else if (op === "MOVE" && !keys[key] && !positions[key]) {  // À faire ici
+          positions[key] = {position: value as number, clock};
+          clock--;
         } else if (op === "DEL" && !keys[key]) {
           keys[key] = true;
         }
@@ -152,19 +157,30 @@ const OrderedKeyValue =
         value: unknown;
         hash: string;
         position: number;
+        clock: number;
       }[] = [];
       for await (const entry of iterator()) {
         values.unshift(entry);
       }
+      const nonNegativePositionValues = values.map(
+        v => ({
+          ...v,
+          position: v.position >= 0 ? v.position : values.length + (v.position)
+        })
+      )
+      console.log(nonNegativePositionValues)
 
-      return values
-        .sort((a, b) =>
-          a.position > b.position ? 1 : a.position === b.position ? 0 : -1,
+      return nonNegativePositionValues
+        .sort((a, b) =>{
+          return a.position > b.position ? 1 : a.position === b.position ? (
+            a.clock - b.clock
+          ) : -1
+        }
         )
-        .map((x) => ({
-          key: x.key,
-          value: x.value,
-          hash: x.hash,
+        .map((v) => ({
+          key: v.key,
+          value: v.value,
+          hash: v.hash,
         }));
     };
 
