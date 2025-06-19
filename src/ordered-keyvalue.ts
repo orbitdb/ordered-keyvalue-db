@@ -6,8 +6,11 @@ import {
   type MetaData,
   type DagCborEncodable,
   type LogEntry,
+  Log,
 } from "@orbitdb/core";
 import type { HeliaLibp2p } from "helia";
+import type { Libp2p } from "libp2p";
+import type { ServiceMap } from "@libp2p/interface";
 
 export type OrderedKeyValueDatabaseType = Awaited<
   ReturnType<ReturnType<typeof OrderedKeyValue>>
@@ -17,7 +20,7 @@ const type = "ordered-keyvalue" as const;
 
 const OrderedKeyValue =
   () =>
-  async ({
+  async <T extends ServiceMap = ServiceMap>({
     ipfs,
     identity,
     address,
@@ -32,7 +35,7 @@ const OrderedKeyValue =
     syncAutomatically,
     onUpdate,
   }: {
-    ipfs: HeliaLibp2p;
+    ipfs: HeliaLibp2p<Libp2p<T>>;
     identity?: Identity;
     address: string;
     name?: string;
@@ -44,7 +47,7 @@ const OrderedKeyValue =
     indexStorage?: Storage;
     referencesCount?: number;
     syncAutomatically?: boolean;
-    onUpdate?: () => void;
+    onUpdate?: (log: Log, entry: LogEntry) => void;
   }) => {
     const database = await Database({
       ipfs,
