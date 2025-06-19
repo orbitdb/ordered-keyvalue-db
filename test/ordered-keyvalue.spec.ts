@@ -355,7 +355,7 @@ describe("OrderedKeyValue Database", () => {
       const hash2 = await db.put(key2, value2);
       const hash3 = await db.put(key3, value3);
       await db.move(key, 1);
-      
+
       const actual1 = await db.all();
       expect(actual1).to.deep.equal([
         { value: value2, key: key2, hash: hash2 },
@@ -364,7 +364,7 @@ describe("OrderedKeyValue Database", () => {
       ]);
 
       await db.move(key, 2);
-      
+
       const actual2 = await db.all();
       expect(actual2).to.deep.equal([
         { value: value2, key: key2, hash: hash2 },

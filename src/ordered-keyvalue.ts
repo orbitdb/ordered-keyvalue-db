@@ -118,37 +118,46 @@ const OrderedKeyValue =
       let count = 0;
       const orderedLogEntries: LogEntry<DagCborEncodable>[] = [];
       for await (const entry of log.traverse()) {
-        orderedLogEntries.unshift(entry)
-      };
+        orderedLogEntries.unshift(entry);
+      }
 
-      let finalEntries: {key: string; value: unknown; position: number, hash: string}[] = []
+      let finalEntries: {
+        key: string;
+        value: unknown;
+        position: number;
+        hash: string;
+      }[] = [];
       for (const entry of orderedLogEntries) {
         const { op, key, value } = entry.payload;
         if (!key) return;
 
         if (op === "PUT") {
-          finalEntries = finalEntries.filter(e=>e.key !== key);
+          finalEntries = finalEntries.filter((e) => e.key !== key);
 
           const putValue = value as { value: unknown; position?: number };
 
           const hash = entry.hash;
 
-          const position = putValue.position !== undefined ? putValue.position : -1;
+          const position =
+            putValue.position !== undefined ? putValue.position : -1;
           finalEntries.push({
             key,
             value: putValue.value,
             position,
-            hash
+            hash,
           });
-          count++
+          count++;
         } else if (op === "MOVE") {
-          const existingEntry = finalEntries.find(e=>e.key === key);
+          const existingEntry = finalEntries.find((e) => e.key === key);
           if (existingEntry) {
             existingEntry.position = value as number;
-            finalEntries = [...finalEntries.filter(e=>e.key !== key), existingEntry]
+            finalEntries = [
+              ...finalEntries.filter((e) => e.key !== key),
+              existingEntry,
+            ];
           }
         } else if (op === "DEL") {
-          finalEntries = finalEntries.filter(e=>e.key !== key);
+          finalEntries = finalEntries.filter((e) => e.key !== key);
         }
         if (amount !== undefined && count >= amount) {
           break;
@@ -169,7 +178,7 @@ const OrderedKeyValue =
         position: number;
       }[] = [];
       for await (const entry of iterator()) {
-        entries.push(entry)
+        entries.push(entry);
       }
 
       const values: {
@@ -179,14 +188,17 @@ const OrderedKeyValue =
       }[] = [];
 
       for (const entry of entries) {
-        const position = entry.position >= 0 ? entry.position : (entries.length + entry.position + 1)
+        const position =
+          entry.position >= 0
+            ? entry.position
+            : entries.length + entry.position + 1;
         values.splice(position, 0, {
           key: entry.key,
           value: entry.value,
           hash: entry.hash,
-        })
+        });
       }
-      
+
       return values;
     };
 
