@@ -90,8 +90,6 @@ export const OrderedKeyValueApi = ({
 }: {
   database: InternalDatabase;
 }) => {
-  const { addOperation, log } = database;
-
   const put = async (
     key: string,
     value: DagCborEncodable,
@@ -103,21 +101,21 @@ export const OrderedKeyValueApi = ({
     if (position !== undefined) {
       entryValue.position = position;
     }
-    return addOperation({ op: "PUT", key, value: entryValue });
+    return database.addOperation({ op: "PUT", key, value: entryValue });
   };
 
   const move = async (key: string, position: number): Promise<string> => {
-    return addOperation({ op: "MOVE", key, value: position });
+    return database.addOperation({ op: "MOVE", key, value: position });
   };
 
   const del = async (key: string): Promise<string> => {
-    return addOperation({ op: "DEL", key, value: null });
+    return database.addOperation({ op: "DEL", key, value: null });
   };
 
   const get = async (
     key: string,
   ): Promise<{ value: unknown; position?: number } | undefined> => {
-    for await (const entry of log.traverse()) {
+    for await (const entry of database.log.traverse()) {
       const { op, key: k, value } = entry.payload;
       if (op === "PUT" && k === key) {
         return value as { value: unknown; position?: number };
@@ -142,7 +140,7 @@ export const OrderedKeyValueApi = ({
   > {
     let count = 0;
     const orderedLogEntries: LogEntry<DagCborEncodable>[] = [];
-    for await (const entry of log.traverse()) {
+    for await (const entry of database.log.traverse()) {
       orderedLogEntries.unshift(entry);
     }
 
