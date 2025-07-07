@@ -66,15 +66,9 @@ const OrderedKeyValue =
       onUpdate,
     });
 
-    const {
-      put,
-      del,
-      move,
-      get,
-      iterator,
-      all,
-    } = OrderedKeyValueApi({ database });
-
+    const { put, del, move, get, iterator, all } = OrderedKeyValueApi({
+      database,
+    });
 
     return {
       ...database,
@@ -91,7 +85,11 @@ const OrderedKeyValue =
 
 OrderedKeyValue.type = type;
 
-export const OrderedKeyValueApi = ({ database }: { database: InternalDatabase }) => {
+export const OrderedKeyValueApi = ({
+  database,
+}: {
+  database: InternalDatabase;
+}) => {
   const { addOperation, log } = database;
 
   const put = async (
@@ -230,8 +228,13 @@ export const OrderedKeyValueApi = ({ database }: { database: InternalDatabase })
   };
 
   return {
-    get, put, move, del, iterator, all
-  }
-}
+    get,
+    put,
+    move,
+    del,
+    iterator,
+    all,
+  };
+};
 
 export default OrderedKeyValue;
