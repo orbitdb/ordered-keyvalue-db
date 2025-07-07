@@ -1,6 +1,7 @@
 export {
   default as OrderedKeyValue,
   OrderedKeyValueDatabaseType,
+  OrderedKeyValueApi,
 } from "@/ordered-keyvalue.js";
 
 export { registerOrderedKeyValue } from "@/utils.js";

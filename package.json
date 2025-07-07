@@ -40,7 +40,7 @@
     "@libp2p/interface": "^2.10.4",
     "@libp2p/webrtc": "^5.2.19",
     "@libp2p/websockets": "^9.2.16",
-    "@orbitdb/core-types": "^1.0.15",
+    "@orbitdb/core-types": "^1.1.6",
     "@types/mocha": "^10.0.10",
     "aegir": "^45.2.1",
     "blockstore-core": "^5.0.4",
