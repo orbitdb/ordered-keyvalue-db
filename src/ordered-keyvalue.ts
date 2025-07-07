@@ -66,7 +66,7 @@ const OrderedKeyValue =
       onUpdate,
     });
 
-    const { put, del, move, get, iterator, all } = OrderedKeyValueApi({
+    const { put, set, del, move, get, iterator, all } = OrderedKeyValueApi({
       database,
     });
 
@@ -74,7 +74,7 @@ const OrderedKeyValue =
       ...database,
       type,
       put,
-      set: put, // Alias for put()
+      set,
       del,
       move,
       get,
@@ -229,6 +229,7 @@ export const OrderedKeyValueApi = ({
 
   return {
     get,
+    set: put, // Alias for put()
     put,
     move,
     del,
