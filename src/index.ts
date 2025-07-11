@@ -4,7 +4,7 @@ export {
   OrderedKeyValueApi,
 } from "@/ordered-keyvalue.js";
 
-export { registerOrderedKeyValue } from "@/utils.js";
+export { getScalePosition } from "@/utils.js";
 
 export { DBElements } from "@/types.js";
 

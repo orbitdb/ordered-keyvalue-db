@@ -14,11 +14,11 @@ A `KeyValue` database where you can move entries around. Ideal for situations wh
 ## Examples
 
 ```ts
-import { createOrbitDB } from "@orbitdb/core";
+import { useDatabaseType, createOrbitDB } from "@orbitdb/core";
 import { registerOrderedKeyValue } from "@orbitdb/ordered-keyvalue-db";
 
 // Register database type. IMPORTANT - must call before creating orbit instance !
-registerOrderedKeyValue();
+useDatabaseType(OrderedKeyValue)
 
 const orbit = await createOrbitDB({ ipfs })
 

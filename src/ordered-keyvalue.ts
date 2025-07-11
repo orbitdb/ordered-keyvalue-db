@@ -13,6 +13,7 @@ import type { HeliaLibp2p } from "helia";
 import type { Libp2p } from "libp2p";
 import type { ServiceMap } from "@libp2p/interface";
 import itAll from 'it-all'
+import { getScalePosition } from "./utils.js";
 
 export type OrderedKeyValueDatabaseType = Awaited<
   ReturnType<ReturnType<typeof OrderedKeyValue>>
@@ -91,40 +92,26 @@ export const OrderedKeyValueApi = ({
 }: {
   database: InternalDatabase;
 }) => {
-  const getScalePosition = async ({ key, position }: { key: string; position: number }): Promise<number> => {
-    // Somewhat inefficient, I suppose, but we need to know which entries are already present.
-    const entries = (await itAll(iterator())).sort((a, b) => a.position - b.position);
-
-    // Negative values mean insert from end of list.
-    if (position < 0) position = entries.length - (position + 1)
-
-    // Find any previous position
-    const previousPosition = entries.find(x=>x.key === key)?.position;
-
-    // If we are moving upwards, need to add 1 to adjust for the now-deleted slot where our entry used to be
-    if (previousPosition !== undefined && position > previousPosition) position = position + 1
-
-    const beforePosition = entries[Math.min(position, entries.length) - 1]?.position;
-    const afterPosition = entries[Math.max(position, 0)]?.position;
-
-    if (beforePosition === undefined) return afterPosition === undefined ? 0 : afterPosition - 1;
-    return afterPosition === undefined ? beforePosition + 1 : beforePosition + (afterPosition - beforePosition) * Math.random()
-  }
 
   const put = async (
     key: string,
     value: DagCborEncodable,
     position = -1,
   ): Promise<string> => {
+    // Somewhat inefficient, I suppose, but we need to know which entries are already present.
+    const entries = await itAll(iterator());
     const entryValue: { value: DagCborEncodable; position: number } = {
       value,
-      position: await getScalePosition({key, position}),
+      position: await getScalePosition({entries, key, position}),
     };
     return database.addOperation({ op: "PUT", key, value: entryValue });
   };
 
   const move = async (key: string, position: number): Promise<void> => {
-    position = await getScalePosition({key, position});
+    // Somewhat inefficient, I suppose, but we need to know which entries are already present.
+    const entries = await itAll(iterator());
+    position = await getScalePosition({entries, key, position});
+    
     await database.addOperation({ op: "MOVE", key, value: position });
   };
 
