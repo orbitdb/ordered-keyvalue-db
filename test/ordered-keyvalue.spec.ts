@@ -227,6 +227,7 @@ describe("OrderedKeyValue Database", () => {
       const hash = await db.put(key, value);
       const hash2 = await db.put(key2, value2);
       await db.move(key, 1);
+
       const actual = await db.all();
 
       expect(actual).to.deep.equal([
@@ -309,24 +310,29 @@ describe("OrderedKeyValue Database", () => {
     });
 
     it("move and override a key concurrently", async () => {
-      const value = "value1";
-      const valueMod = "value1a";
-      const key = "key1";
+      const key1 = "key1";
+      const value1 = "value1";
 
-      const value2 = "value2";
       const key2 = "key2";
+      const value2 = "value2";
+      const value2Mod = "value2a";
 
-      await db.put(key, value);
-      const hash2 = await db.put(key2, value2);
-      await db.move(key, 1);
+      const key3 = "key3";
+      const value3 = "value3";
 
-      const hash = await db.put(key, valueMod);
+      const hash1 = await db.put(key1, value1);
+      await db.put(key2, value2);
+      const hash3 = await db.put(key3, value3);
+      await db.move(key1, 1);
+
+      const hash2 = await db.put(key2, value2Mod);
 
       const actual = await db.all();
 
       expect(actual).to.deep.equal([
-        { value: value2, key: key2, hash: hash2 },
-        { value: valueMod, key, hash },
+        { value: value2Mod, key: key2, hash: hash2 },
+        { value: value1, key: key1, hash: hash1 },
+        { value: value3, key: key3, hash: hash3 },
       ]);
     });
 

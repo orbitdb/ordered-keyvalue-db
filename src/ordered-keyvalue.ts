@@ -95,14 +95,29 @@ export const OrderedKeyValueApi = ({
   const put = async (
     key: string,
     value: DagCborEncodable,
-    position = -1,
+    position?: number,
   ): Promise<string> => {
     // Somewhat inefficient, I suppose, but we need to know which entries are already present.
     const entries = await itAll(iterator());
-    const entryValue: { value: DagCborEncodable; position: number } = {
+
+    // Avoid overwriting existing position; default to end of list (findIndex gives -1)
+    let scaledPosition: number | undefined = undefined;
+    if (position === undefined) {
+      scaledPosition = entries.find((e) => e.key === key)?.position;
+    }
+    if (scaledPosition === undefined) {
+      scaledPosition = await getScalePosition({
+        entries,
+        key,
+        position: position ?? -1,
+      });
+    }
+
+    const entryValue = {
       value,
-      position: await getScalePosition({ entries, key, position }),
+      position: scaledPosition,
     };
+
     return database.addOperation({ op: "PUT", key, value: entryValue });
   };
 
@@ -143,30 +158,33 @@ export const OrderedKeyValueApi = ({
     unknown
   > {
     let count = 0;
-    const keys: { [key: string]: true } = {};
-    const positions: { [key: string]: number } = {};
+
+    // `true` indicates a `PUT` operation; `number` indicates a `MOVE` operation
+    const keys: { [key: string]: true | number } = {};
 
     for await (const entry of database.log.traverse()) {
       const { op, key, value } = entry.payload;
+      if (typeof key !== "string") continue;
 
-      if (!key || keys[key]) continue;
-
-      if (op === "PUT") {
+      if (op === "PUT" && keys[key] !== true) {
         const hash = entry.hash;
-        const putValue = value as { value: unknown; position?: number };
+        const putValue = value as { value: unknown; position: number };
 
+        const position =
+          typeof keys[key] === "number"
+            ? (keys[key] as number)
+            : putValue.position;
         keys[key] = true;
         count++;
 
         yield {
           key,
           value: putValue.value,
-          position: positions[key] ?? putValue.position ?? -1,
+          position,
           hash,
         };
-      } else if (op === "MOVE") {
-        if (positions[key] !== undefined || keys[key]) continue;
-        positions[key] = value as number;
+      } else if (op === "MOVE" && !keys[key]) {
+        keys[key] = value as number;
       } else if (op === "DEL") {
         keys[key] = true;
       }
