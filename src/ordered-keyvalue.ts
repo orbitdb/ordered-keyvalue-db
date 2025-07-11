@@ -12,7 +12,7 @@ import {
 import type { HeliaLibp2p } from "helia";
 import type { Libp2p } from "libp2p";
 import type { ServiceMap } from "@libp2p/interface";
-import itAll from 'it-all'
+import itAll from "it-all";
 import { getScalePosition } from "./utils.js";
 
 export type OrderedKeyValueDatabaseType = Awaited<
@@ -92,7 +92,6 @@ export const OrderedKeyValueApi = ({
 }: {
   database: InternalDatabase;
 }) => {
-
   const put = async (
     key: string,
     value: DagCborEncodable,
@@ -102,7 +101,7 @@ export const OrderedKeyValueApi = ({
     const entries = await itAll(iterator());
     const entryValue: { value: DagCborEncodable; position: number } = {
       value,
-      position: await getScalePosition({entries, key, position}),
+      position: await getScalePosition({ entries, key, position }),
     };
     return database.addOperation({ op: "PUT", key, value: entryValue });
   };
@@ -110,8 +109,8 @@ export const OrderedKeyValueApi = ({
   const move = async (key: string, position: number): Promise<void> => {
     // Somewhat inefficient, I suppose, but we need to know which entries are already present.
     const entries = await itAll(iterator());
-    position = await getScalePosition({entries, key, position});
-    
+    position = await getScalePosition({ entries, key, position });
+
     await database.addOperation({ op: "MOVE", key, value: position });
   };
 
@@ -119,9 +118,7 @@ export const OrderedKeyValueApi = ({
     return database.addOperation({ op: "DEL", key, value: null });
   };
 
-  const get = async (
-    key: string,
-  ): Promise<DagCborEncodable | undefined> => {
+  const get = async (key: string): Promise<DagCborEncodable | undefined> => {
     for await (const entry of database.log.traverse()) {
       const { op, key: k, value } = entry.payload;
       if (op === "PUT" && k === key) {
@@ -146,8 +143,8 @@ export const OrderedKeyValueApi = ({
     unknown
   > {
     let count = 0;
-    const keys: {[key: string]: true} = {};
-    const positions: {[key: string]: number} = {};
+    const keys: { [key: string]: true } = {};
+    const positions: { [key: string]: number } = {};
 
     for await (const entry of database.log.traverse()) {
       const { op, key, value } = entry.payload;
@@ -157,17 +154,16 @@ export const OrderedKeyValueApi = ({
       if (op === "PUT") {
         const hash = entry.hash;
         const putValue = value as { value: unknown; position?: number };
-        
+
         keys[key] = true;
         count++;
-        
+
         yield {
           key,
           value: putValue.value,
           position: positions[key] ?? putValue.position ?? -1,
           hash,
-        }
-        
+        };
       } else if (op === "MOVE") {
         if (positions[key] !== undefined || keys[key]) continue;
         positions[key] = value as number;
@@ -178,7 +174,6 @@ export const OrderedKeyValueApi = ({
         break;
       }
     }
-
   };
 
   const all = async () => {
@@ -191,11 +186,13 @@ export const OrderedKeyValueApi = ({
     for await (const entry of iterator()) {
       entries.push(entry);
     }
-    return entries.sort((a, b) => a.position - b.position).map(e=>({
-      key: e.key,
-      value: e.value,
-      hash: e.hash,
-    }));
+    return entries
+      .sort((a, b) => a.position - b.position)
+      .map((e) => ({
+        key: e.key,
+        value: e.value,
+        hash: e.hash,
+      }));
   };
 
   return {
