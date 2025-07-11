@@ -27,7 +27,8 @@
   },
   "dependencies": {
     "@orbitdb/core": "^3.0.2",
-    "helia": "^5.4.2"
+    "helia": "^5.4.2",
+    "it-all": "^3.0.9"
   },
   "devDependencies": {
     "@chainsafe/libp2p-gossipsub": "^14.1.1",

@@ -12,6 +12,7 @@ import {
 import type { HeliaLibp2p } from "helia";
 import type { Libp2p } from "libp2p";
 import type { ServiceMap } from "@libp2p/interface";
+import itAll from 'it-all'
 
 export type OrderedKeyValueDatabaseType = Awaited<
   ReturnType<ReturnType<typeof OrderedKeyValue>>
@@ -90,22 +91,41 @@ export const OrderedKeyValueApi = ({
 }: {
   database: InternalDatabase;
 }) => {
+  const getScalePosition = async ({ key, position }: { key: string; position: number }): Promise<number> => {
+    // Somewhat inefficient, I suppose, but we need to know which entries are already present.
+    const entries = (await itAll(iterator())).sort((a, b) => a.position - b.position);
+
+    // Negative values mean insert from end of list.
+    if (position < 0) position = entries.length - (position + 1)
+
+    // Find any previous position
+    const previousPosition = entries.find(x=>x.key === key)?.position;
+
+    // If we are moving upwards, need to add 1 to adjust for the now-deleted slot where our entry used to be
+    if (previousPosition !== undefined && position > previousPosition) position = position + 1
+
+    const beforePosition = entries[Math.min(position, entries.length) - 1]?.position;
+    const afterPosition = entries[Math.max(position, 0)]?.position;
+
+    if (beforePosition === undefined) return afterPosition === undefined ? 0 : afterPosition - 1;
+    return afterPosition === undefined ? beforePosition + 1 : beforePosition + (afterPosition - beforePosition) * Math.random()
+  }
+
   const put = async (
     key: string,
     value: DagCborEncodable,
-    position?: number,
+    position = -1,
   ): Promise<string> => {
-    const entryValue: { value: DagCborEncodable; position?: number } = {
+    const entryValue: { value: DagCborEncodable; position: number } = {
       value,
+      position: await getScalePosition({key, position}),
     };
-    if (position !== undefined) {
-      entryValue.position = position;
-    }
     return database.addOperation({ op: "PUT", key, value: entryValue });
   };
 
-  const move = async (key: string, position: number): Promise<string> => {
-    return database.addOperation({ op: "MOVE", key, value: position });
+  const move = async (key: string, position: number): Promise<void> => {
+    position = await getScalePosition({key, position});
+    await database.addOperation({ op: "MOVE", key, value: position });
   };
 
   const del = async (key: string): Promise<string> => {
@@ -114,11 +134,11 @@ export const OrderedKeyValueApi = ({
 
   const get = async (
     key: string,
-  ): Promise<{ value: unknown; position?: number } | undefined> => {
+  ): Promise<DagCborEncodable | undefined> => {
     for await (const entry of database.log.traverse()) {
       const { op, key: k, value } = entry.payload;
       if (op === "PUT" && k === key) {
-        return value as { value: unknown; position?: number };
+        return (value as { value: DagCborEncodable; position: number }).value;
       } else if (op === "DEL" && k === key) {
         return undefined;
       }
@@ -139,58 +159,39 @@ export const OrderedKeyValueApi = ({
     unknown
   > {
     let count = 0;
-    const orderedLogEntries: LogEntry<DagCborEncodable>[] = [];
-    for await (const entry of database.log.traverse()) {
-      orderedLogEntries.unshift(entry);
-    }
+    const keys: {[key: string]: true} = {};
+    const positions: {[key: string]: number} = {};
 
-    let finalEntries: {
-      key: string;
-      value: unknown;
-      position: number;
-      hash: string;
-    }[] = [];
-    for (const entry of orderedLogEntries) {
+    for await (const entry of database.log.traverse()) {
       const { op, key, value } = entry.payload;
-      if (!key) return;
+
+      if (!key || keys[key]) continue;
 
       if (op === "PUT") {
-        finalEntries = finalEntries.filter((e) => e.key !== key);
-
-        const putValue = value as { value: unknown; position?: number };
-
         const hash = entry.hash;
-
-        const position =
-          putValue.position !== undefined ? putValue.position : -1;
-        finalEntries.push({
+        const putValue = value as { value: unknown; position?: number };
+        
+        keys[key] = true;
+        count++;
+        
+        yield {
           key,
           value: putValue.value,
-          position,
+          position: positions[key] ?? putValue.position ?? -1,
           hash,
-        });
-        count++;
-      } else if (op === "MOVE") {
-        const existingEntry = finalEntries.find((e) => e.key === key);
-        if (existingEntry) {
-          existingEntry.position = value as number;
-          finalEntries = [
-            ...finalEntries.filter((e) => e.key !== key),
-            existingEntry,
-          ];
         }
+        
+      } else if (op === "MOVE") {
+        if (positions[key] !== undefined || keys[key]) continue;
+        positions[key] = value as number;
       } else if (op === "DEL") {
-        finalEntries = finalEntries.filter((e) => e.key !== key);
+        keys[key] = true;
       }
       if (amount !== undefined && count >= amount) {
         break;
       }
     }
 
-    // This is memory inefficient, but I haven't been able to think of a more elegant solution
-    for (const entry of finalEntries) {
-      yield entry;
-    }
   };
 
   const all = async () => {
@@ -203,26 +204,11 @@ export const OrderedKeyValueApi = ({
     for await (const entry of iterator()) {
       entries.push(entry);
     }
-
-    const values: {
-      key: string;
-      value: unknown;
-      hash: string;
-    }[] = [];
-
-    for (const entry of entries) {
-      const position =
-        entry.position >= 0
-          ? entry.position
-          : entries.length + entry.position + 1;
-      values.splice(position, 0, {
-        key: entry.key,
-        value: entry.value,
-        hash: entry.hash,
-      });
-    }
-
-    return values;
+    return entries.sort((a, b) => a.position - b.position).map(e=>({
+      key: e.key,
+      value: e.value,
+      hash: e.hash,
+    }));
   };
 
   return {

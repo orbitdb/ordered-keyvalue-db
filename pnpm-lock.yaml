@@ -14,6 +14,9 @@ importers:
       helia:
         specifier: ^5.4.2
         version: 5.4.2(react-native@0.74.3(@babel/core@7.28.0)(@babel/preset-env@7.24.8(@babel/core@7.28.0))(react@18.2.0))
+      it-all:
+        specifier: ^3.0.9
+        version: 3.0.9
     devDependencies:
       '@chainsafe/libp2p-gossipsub':
         specifier: ^14.1.1

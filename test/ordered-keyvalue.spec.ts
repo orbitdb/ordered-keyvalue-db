@@ -105,18 +105,7 @@ describe("OrderedKeyValue Database", () => {
 
       const actual = await db.get(key);
 
-      expect(actual).to.deep.equal({ value });
-    });
-
-    it("get a value with position", async () => {
-      const value = "value1";
-      const key = "key1";
-
-      await db.put(key, value, 3);
-
-      const actual = await db.get(key);
-
-      expect(actual).to.deep.equal({ value, position: 3 });
+      expect(actual).to.deep.equal(value);
     });
 
     it("override a key", async () => {
@@ -129,7 +118,7 @@ describe("OrderedKeyValue Database", () => {
 
       const actual = await db.get(key);
 
-      expect(actual).to.deep.equal({ value: value2 });
+      expect(actual).to.deep.equal(value2);
     });
 
     it("del a value", async () => {
@@ -174,7 +163,7 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
-    it("add a value - index 0", async () => {
+    it("add a value: index 0", async () => {
       const value = "value1";
       const key = "key1";
 
@@ -192,7 +181,7 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
-    it("add a value - negative index", async () => {
+    it("add a value: negative index", async () => {
       const value = "value1";
       const key = "key1";
 
@@ -210,20 +199,20 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
-    it("add a value - index > length", async () => {
-      const value = "value1";
-      const key = "key1";
+    it("add a value: index > length", async () => {
+      const value1 = "value1";
+      const key1 = "key1";
 
       const value2 = "value2";
       const key2 = "key2";
 
-      const hash = await db.put(key, value);
+      const hash = await db.put(key1, value1);
       const hash2 = await db.put(key2, value2, 4);
 
       const actual = await db.all();
 
       expect(actual).to.deep.equal([
-        { value: value, key, hash },
+        { value: value1, key: key1, hash },
         { value: value2, key: key2, hash: hash2 },
       ]);
     });
@@ -246,7 +235,7 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
-    it("move a value - index 0", async () => {
+    it("move a value: index 0", async () => {
       const value = "value1";
       const key = "key1";
 
@@ -264,7 +253,7 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
-    it("move a value - negative index", async () => {
+    it("move a value: negative index", async () => {
       const value = "value1";
       const key = "key1";
 
@@ -282,7 +271,7 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
-    it("move a value - index > length", async () => {
+    it("move a value: index > length", async () => {
       const value = "value1";
       const key = "key1";
 
@@ -309,13 +298,13 @@ describe("OrderedKeyValue Database", () => {
 
       await db.put(key, value);
       const hash2 = await db.put(key2, value2);
-      const hash1a = await db.put(key, value, 2);
+      const hash1 = await db.put(key, value, 2);
 
       const actual = await db.all();
 
       expect(actual).to.deep.equal([
         { value: value2, key: key2, hash: hash2 },
-        { value: value, key, hash: hash1a },
+        { value: value, key, hash: hash1 },
       ]);
     });
 
@@ -423,7 +412,7 @@ describe("OrderedKeyValue Database", () => {
 
       const all = [];
       for await (const pair of db.iterator()) {
-        all.push(pair);
+        all.unshift(pair);
       }
 
       expect(all).to.deep.equal(keyvalue);
@@ -474,11 +463,13 @@ describe("OrderedKeyValue Database", () => {
       await db.put("key6", "value6");
       await db.del("key6");
 
+      // Also check that moving values does not count towards
+      // the returned amount.
+      await db.move("key1", -1);
+
       const all = [];
-      let position = 0;
       for await (const { hash, value } of db.iterator()) {
-        all.unshift({ hash, value, position });
-        position++;
+        all.unshift({ hash, value });
       }
       expect(all.length).to.equal(5);
     });
