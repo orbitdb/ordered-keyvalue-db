@@ -150,7 +150,7 @@ export const OrderedKeyValueApi = ({
   }: { amount?: number } = {}): AsyncGenerator<
     {
       key: string;
-      value: unknown;
+      value: DagCborEncodable;
       position: number;
       hash: string;
     },
@@ -168,7 +168,7 @@ export const OrderedKeyValueApi = ({
 
       if (op === "PUT" && keys[key] !== true) {
         const hash = entry.hash;
-        const putValue = value as { value: unknown; position: number };
+        const putValue = value as { value: DagCborEncodable; position: number };
 
         const position =
           typeof keys[key] === "number"
@@ -197,7 +197,7 @@ export const OrderedKeyValueApi = ({
   const all = async () => {
     const entries: {
       key: string;
-      value: unknown;
+      value: DagCborEncodable;
       hash: string;
       position: number;
     }[] = [];
