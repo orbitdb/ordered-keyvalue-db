@@ -40,5 +40,6 @@ export const getScalePosition = async ({
   // Insert to end of list if there is no following entry, or somewhere between adjacent entries
   return nextScalePosition === undefined
     ? previousScalePosition + Math.random()
-    : previousScalePosition + (nextScalePosition - previousScalePosition) * Math.random();
+    : previousScalePosition +
+        (nextScalePosition - previousScalePosition) * Math.random();
 };
