@@ -31,7 +31,7 @@ export const getScalePosition = async ({
   const nextScalePosition = entries[Math.max(position, 0)]?.position;
 
   // Insert to beginning of list if there is no preceding entry
-  // Note: use Math.random() rather than mean to reduce risk of collisions in concurrent edits
+  // Note: use Math.random() rather to reduce risk of collisions in concurrent edits
   if (previousScalePosition === undefined)
     return nextScalePosition === undefined
       ? Math.random()
@@ -39,6 +39,6 @@ export const getScalePosition = async ({
 
   // Insert to end of list if there is no following entry, or somewhere between adjacent entries
   return nextScalePosition === undefined
-    ? previousScalePosition + 1 * Math.random()
+    ? previousScalePosition + Math.random()
     : previousScalePosition + (nextScalePosition - previousScalePosition) * Math.random();
 };
