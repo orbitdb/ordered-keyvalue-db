@@ -377,12 +377,10 @@ describe("OrderedKeyValue Database", () => {
 
       const actual = await db.all();
 
-      // Here we only check the middle value, because we don't know if key0 or key1 was 
+      // Here we only check the middle value, because we don't know if key0 or key1 was
       // added first due to the race condition we intentionally introduced above
-      expect(actual[1]).to.deep.equal(
-        { value: "between", key: "in", hash },
-      );
-    })
+      expect(actual[1]).to.deep.equal({ value: "between", key: "in", hash });
+    });
 
     it("returns all values", async () => {
       const keyvalue: {
