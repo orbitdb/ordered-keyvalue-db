@@ -19,26 +19,26 @@ export const getScalePosition = async ({
   if (position < 0) position = entries.length - (position + 1);
 
   // Find any previous position
-  const previousPosition = entries.find((x) => x.key === key)?.position;
+  const previousPosition = entries.findIndex((x) => x.key === key);
 
   // If we are moving upwards, need to add 1 to adjust for the now-deleted slot where our entry used to be
-  if (previousPosition !== undefined && position > previousPosition)
+  if (previousPosition !== -1 && position > previousPosition)
     position = position + 1;
 
   // Calculate scale positions of previous and next entries, if they exist
-  const beforePosition =
+  const previousScalePosition =
     entries[Math.min(position, entries.length) - 1]?.position;
-  const afterPosition = entries[Math.max(position, 0)]?.position;
+  const nextScalePosition = entries[Math.max(position, 0)]?.position;
 
   // Insert to beginning of list if there is no preceding entry
   // Note: use Math.random() rather than mean to reduce risk of collisions in concurrent edits
-  if (beforePosition === undefined)
-    return afterPosition === undefined
+  if (previousScalePosition === undefined)
+    return nextScalePosition === undefined
       ? Math.random()
-      : afterPosition - Math.random();
+      : nextScalePosition - Math.random();
 
   // Insert to end of list if there is no following entry, or somewhere between adjacent entries
-  return afterPosition === undefined
-    ? beforePosition + 1 * Math.random()
-    : beforePosition + (afterPosition - beforePosition) * Math.random();
+  return nextScalePosition === undefined
+    ? previousScalePosition + 1 * Math.random()
+    : previousScalePosition + (nextScalePosition - previousScalePosition) * Math.random();
 };
