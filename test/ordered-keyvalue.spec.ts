@@ -8,6 +8,7 @@ import { DBElements } from "@/types.js";
 import { createTestHelia } from "./config.js";
 import { isBrowser } from "wherearewe";
 import { expect } from "aegir/chai";
+import { sortPosition } from "./utils.js";
 
 const keysPath = "./testkeys";
 
@@ -368,6 +369,21 @@ describe("OrderedKeyValue Database", () => {
       ]);
     });
 
+    it("synchronous addition", async () => {
+      await Promise.all(
+        [...Array(2).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
+      );
+      const hash = await db.put("in", "between", 1);
+
+      const actual = await db.all();
+
+      // Here we only check the middle value, because we don't know if key0 or key1 was 
+      // added first due to the race condition we intentionally introduced above
+      expect(actual[1]).to.deep.equal(
+        { value: "between", key: "in", hash },
+      );
+    })
+
     it("returns all values", async () => {
       const keyvalue: {
         value: DBElements;
@@ -421,7 +437,7 @@ describe("OrderedKeyValue Database", () => {
         all.unshift(pair);
       }
 
-      expect(all).to.deep.equal(keyvalue);
+      expect(sortPosition(all)).to.deep.equal(sortPosition(keyvalue));
     });
   });
 

@@ -31,12 +31,12 @@ export const getScalePosition = async ({
   const afterPosition = entries[Math.max(position, 0)]?.position;
 
   // Insert to beginning of list if there is no preceding entry
+  // Note: use Math.random() rather than mean to reduce risk of collisions in concurrent edits
   if (beforePosition === undefined)
-    return afterPosition === undefined ? 0 : afterPosition - 1;
+    return (afterPosition === undefined ? Math.random() : afterPosition - Math.random());
 
   // Insert to end of list if there is no following entry, or somewhere between adjacent entries
-  // Note: use Math.random() rather than mean to reduce risk of collisions in concurrent edits
   return afterPosition === undefined
-    ? beforePosition + 1
+    ? beforePosition + 1 * Math.random()
     : beforePosition + (afterPosition - beforePosition) * Math.random();
 };
