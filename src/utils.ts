@@ -5,9 +5,7 @@ export const getScalePosition = ({
 }: {
   entries: {
     key: string;
-    value: unknown;
     position: number;
-    hash: string;
   }[];
   key: string;
   position: number;
