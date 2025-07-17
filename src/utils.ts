@@ -1,4 +1,4 @@
-export const getScalePosition = async ({
+export const getScalePosition = ({
   entries,
   key,
   position,
@@ -11,7 +11,7 @@ export const getScalePosition = async ({
   }[];
   key: string;
   position: number;
-}): Promise<number> => {
+}): number => {
   // Firstly, sort entries by position
   entries = entries.sort((a, b) => a.position - b.position);
 
