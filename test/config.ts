@@ -18,11 +18,7 @@ const Libp2pOptions = {
   addresses: {
     listen: ["/ip4/0.0.0.0/tcp/0/ws", "/p2p-circuit"],
   },
-  transports: [
-    webSockets(),
-    webRTC(),
-    circuitRelayTransport(),
-  ],
+  transports: [webSockets(), webRTC(), circuitRelayTransport()],
   connectionEncryption: [noise()],
   streamMuxers: [yamux()],
   connectionGater: {
@@ -41,11 +37,7 @@ const Libp2pBrowserOptions = {
   addresses: {
     listen: ["/webrtc"],
   },
-  transports: [
-    webSockets(),
-    webRTC(),
-    circuitRelayTransport(),
-  ],
+  transports: [webSockets(), webRTC(), circuitRelayTransport()],
   connectionEncryption: [noise()],
   streamMuxers: [yamux()],
   connectionGater: {

@@ -8,6 +8,6 @@ export type DBElements =
   | Array<DBElements>;
 
 export type PutEntryValue = {
-  value: DagCborEncodable,
-  after?: string,
-}
+  value: DagCborEncodable;
+  after?: string;
+};
