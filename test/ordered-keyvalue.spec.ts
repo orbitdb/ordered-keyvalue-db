@@ -1,4 +1,4 @@
-import { type HeliaLibp2p } from "helia";
+import { type Helia } from "helia";
 
 import { Identities, Identity, KeyStore, KeyStoreType } from "@orbitdb/core";
 import OrderedKeyValue, {
@@ -13,7 +13,7 @@ import { sortPosition } from "./utils.js";
 const keysPath = "./testkeys";
 
 describe("OrderedKeyValue Database", () => {
-  let ipfs: HeliaLibp2p;
+  let ipfs: Helia;
   let identities;
   let keystore: KeyStoreType;
   let testIdentity1: Identity;
