@@ -37,6 +37,7 @@ const OrderedKeyValue =
     referencesCount,
     syncAutomatically,
     onUpdate,
+    signal,
   }: {
     ipfs: Helia<Libp2p<T>>;
     identity?: Identity;
@@ -51,6 +52,7 @@ const OrderedKeyValue =
     referencesCount?: number;
     syncAutomatically?: boolean;
     onUpdate?: (log: Log, entry: LogEntry) => void;
+    signal?: AbortSignal;
   }) => {
     const database = await Database({
       ipfs,
@@ -66,6 +68,7 @@ const OrderedKeyValue =
       referencesCount,
       syncAutomatically,
       onUpdate,
+      signal,
     });
 
     const { put, set, del, move, get, iterator, all } = OrderedKeyValueApi({

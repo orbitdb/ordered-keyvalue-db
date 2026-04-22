@@ -1,6 +1,6 @@
 {
   "name": "@orbitdb/ordered-keyvalue-db",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Ordered keyvalue database type for orbit-db.",
   "author": "Julien Jean Malard-Adam",
   "keywords": [
@@ -41,7 +41,7 @@
     "@libp2p/interface": "^3.2.2",
     "@libp2p/webrtc": "^6.0.19",
     "@libp2p/websockets": "^10.1.10",
-    "@orbitdb/core-types": "^1.2.3",
+    "@orbitdb/core-types": "^1.2.4",
     "@types/mocha": "^10.0.10",
     "aegir": "^47.1.7",
     "blockstore-core": "^6.1.3",
