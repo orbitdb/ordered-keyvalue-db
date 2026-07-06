@@ -33,8 +33,5 @@
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
   },
-  "buildOptions": {
-    "incremental": false
-  },
   "include": ["src", "@types", "test"]
 }

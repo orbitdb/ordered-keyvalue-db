@@ -1,0 +1,6 @@
+allowBuilds:
+  classic-level: true
+  deno: set this to true or false
+  esbuild: true
+  node-datachannel: true
+  unrs-resolver: true
