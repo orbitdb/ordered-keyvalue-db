@@ -14,7 +14,7 @@ import type { Libp2p } from "libp2p";
 import type { ServiceMap } from "@libp2p/interface";
 import itAll from "it-all";
 import { getScalePosition } from "./utils.js";
-import type { TypedEmitter } from "tiny-typed-emitter";
+import { TypedEmitter } from "tiny-typed-emitter";
 
 export type OrderedKeyValueDatabaseType = Awaited<
   ReturnType<ReturnType<typeof OrderedKeyValue>>
