@@ -33,5 +33,5 @@
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
   },
-  "include": ["src", "@types", "test"]
+  "include": ["src", "test"]
 }
