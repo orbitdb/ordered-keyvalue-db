@@ -1,11 +1,11 @@
 export {
   default as OrderedKeyValue,
-  OrderedKeyValueDatabaseType,
+  type OrderedKeyValueDatabaseType,
   OrderedKeyValueApi,
-} from "@/ordered-keyvalue.js";
+} from "./ordered-keyvalue.ts";
 
-export { getScalePosition } from "@/utils.js";
+export { getScalePosition } from "./utils.ts";
 
-export { DBElements } from "@/types.js";
+export type { DBElements } from "./types.ts";
 
-export { version } from "@/version.js";
+export { version } from "./version.ts";

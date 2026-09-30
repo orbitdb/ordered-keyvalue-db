@@ -1,6 +1,6 @@
 // From @orbit-db/core (MIT)
-import { Helia, createHelia } from "helia";
-import { bitswap } from "@helia/block-brokers";
+import { createHelia } from "helia";
+import type { HeliaWithLibp2p } from "@helia/libp2p";
 import { createLibp2p } from "libp2p";
 import { MemoryBlockstore } from "blockstore-core";
 import { LevelBlockstore } from "blockstore-level";
@@ -53,10 +53,8 @@ export const createTestHelia = async ({
   directory,
 }: {
   directory?: string;
-} = {}): Promise<Helia> => {
-  const options = isBrowser() ? Libp2pBrowserOptions : Libp2pOptions;
-
-  const libp2p = await createLibp2p({ ...options });
+} = {}): Promise<HeliaWithLibp2p> => {
+  const libp2p = isBrowser() ? Libp2pBrowserOptions : Libp2pOptions;
 
   const blockstore = directory
     ? new LevelBlockstore(`${directory}/blocks`)
@@ -65,8 +63,7 @@ export const createTestHelia = async ({
   const heliaOptions = {
     blockstore,
     libp2p,
-    blockBrokers: [bitswap()],
   };
 
-  return createHelia({ ...heliaOptions }) as unknown as Helia;
+  return createHelia({ ...heliaOptions }).start();
 };

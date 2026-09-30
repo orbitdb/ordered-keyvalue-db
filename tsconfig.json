@@ -1,37 +1,7 @@
 {
+  "extends": "aegir/src/config/tsconfig.aegir.json",
   "compilerOptions": {
-    "allowJs": false,
-    "declaration": true,
-    "esModuleInterop": true,
-    "incremental": true,
-    "importHelpers": true,
-    "jsx": "react",
-    "lib": ["dom", "esnext"],
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "outDir": "./dist",
-    "sourceMap": true,
-    "strict": true,
-    "strictPropertyInitialization": true,
-    "strictNullChecks": true,
-    "target": "esnext",
-    "useUnknownInCatchVariables": false,
-
-    "skipLibCheck": true,
-    "experimentalDecorators": true,
-    "types": ["mocha"],
-
-    "plugins": [
-      { "transform": "typescript-transform-paths" },
-      { "transform": "typescript-transform-paths", "afterDeclarations": true }
-    ]
+    "outDir": "dist"
   },
   "include": ["src", "test"]
 }

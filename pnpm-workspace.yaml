@@ -1,8 +1,9 @@
 allowBuilds:
+  bun: true
   classic-level: true
   deno: true
   esbuild: true
   node-datachannel: true
   unrs-resolver: true
 minimumReleaseAgeExclude:
-  - '@orbitdb/core-types@1.2.5'
+  - '@orbitdb/core-types@1.2.5 || 2.0.0'

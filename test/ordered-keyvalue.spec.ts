@@ -1,19 +1,23 @@
-import { type Helia } from "helia";
-
-import { Identities, Identity, KeyStore, KeyStoreType } from "@orbitdb/core";
+import {
+  Identities,
+  type Identity,
+  KeyStore,
+  type KeyStoreType,
+} from "@orbitdb/core";
 import OrderedKeyValue, {
-  OrderedKeyValueDatabaseType,
-} from "@/ordered-keyvalue.js";
-import { DBElements } from "@/types.js";
-import { createTestHelia } from "./config.js";
+  type OrderedKeyValueDatabaseType,
+} from "../src/ordered-keyvalue.ts";
+import type { DBElements } from "../src/types.ts";
+import { createTestHelia } from "./config.ts";
 import { isBrowser } from "wherearewe";
 import { expect } from "aegir/chai";
-import { sortPosition } from "./utils.js";
+import { sortPosition } from "./utils.ts";
+import type { HeliaWithLibp2p } from "@helia/libp2p";
 
 const keysPath = "./testkeys";
 
 describe("OrderedKeyValue Database", () => {
-  let ipfs: Helia;
+  let ipfs: HeliaWithLibp2p;
   let identities;
   let keystore: KeyStoreType;
   let testIdentity1: Identity;

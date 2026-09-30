@@ -16,18 +16,18 @@
   "exports": "./dist/index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "compile": "pnpm clean && pnpm tspc -p tsconfig.json",
-    "compile:prod": "pnpm updateVersion && pnpm format && pnpm clean && pnpm tspc -p tsconfig.build.json",
+    "compile": "pnpm clean && pnpm tsc -p tsconfig.json",
+    "compile:prod": "pnpm updateVersion && pnpm clean && pnpm tsc -p tsconfig.build.json",
     "test": "pnpm test:node && pnpm test:browser",
     "test:node": "pnpm compile && pnpm aegir test -t node --cov -- --exit",
     "test:browser": "pnpm compile && pnpm aegir test -t browser --cov -- --exit",
     "format": "pnpm prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\" && pnpm eslint",
-    "release": "pnpm test && pnpm compile:prod && (git commit -a -m 'version' || true) && pnpm publish",
+    "release": "pnpm test && pnpm compile:prod && (git commit -a -m 'version' || true) && pnpm stage publish",
     "updateVersion": "pnpm genversion  --es6 --semi src/version.ts"
   },
   "dependencies": {
     "@orbitdb/core": "^4.0.0",
-    "helia": "^6.1.4",
+    "helia": "^7.1.16",
     "it-all": "^3.0.11",
     "tiny-typed-emitter": "^2.1.0"
   },
@@ -35,48 +35,28 @@
     "@chainsafe/libp2p-noise": "^17.0.0",
     "@chainsafe/libp2p-yamux": "^8.0.1",
     "@eslint/js": "^10.0.1",
-    "@helia/block-brokers": "^5.2.4",
-    "@libp2p/circuit-relay-v2": "^4.2.7",
-    "@libp2p/gossipsub": "^15.0.23",
-    "@libp2p/identify": "^4.1.8",
-    "@libp2p/interface": "^3.2.4",
-    "@libp2p/webrtc": "^6.0.25",
-    "@libp2p/websockets": "^10.1.15",
-    "@orbitdb/core-types": "^1.2.5",
+    "@helia/libp2p": "^2.1.5",
+    "@libp2p/circuit-relay-v2": "^4.2.13",
+    "@libp2p/gossipsub": "^17.1.2",
+    "@libp2p/identify": "^4.1.14",
+    "@libp2p/interface": "^3.3.0",
+    "@libp2p/webrtc": "^6.0.33",
+    "@libp2p/websockets": "^10.1.21",
+    "@orbitdb/core-types": "^2.0.0",
     "@types/mocha": "^10.0.10",
-    "aegir": "^47.2.0",
-    "blockstore-core": "^6.1.3",
-    "blockstore-level": "^3.0.3",
-    "eslint": "^10.6.0",
+    "@types/node": "^26.6.3",
+    "aegir": "^48.1.6",
+    "blockstore-core": "^7.0.1",
+    "blockstore-level": "^4.0.1",
+    "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
     "genversion": "^3.2.0",
-    "libp2p": "^3.3.4",
-    "mocha": "^11.7.6",
-    "prettier": "^3.9.4",
+    "libp2p": "^3.3.11",
+    "mocha": "^11.8.0",
+    "prettier": "^3.9.9",
     "rimraf": "^6.1.3",
-    "ts-patch": "^3.3.0",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.1",
-    "typescript-transform-paths": "^3.5.6",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.71.0",
     "wherearewe": "^2.0.1"
-  },
-  "jest": {
-    "transform": {
-      "(.*).ts$": [
-        "ts-jest",
-        {
-          "useESM": true
-        }
-      ]
-    },
-    "preset": "ts-jest/presets/default-esm",
-    "moduleNameMapper": {
-      "^@/(.*).js$": "<rootDir>/src/$1",
-      "^@/(.*)$": "<rootDir>/src/$1"
-    },
-    "testMatch": [
-      "**/*.test.ts"
-    ],
-    "testEnvironment": "node"
   }
 }

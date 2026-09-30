@@ -6,14 +6,13 @@ import {
   type MetaData,
   type DagCborEncodable,
   type LogEntry,
-  Log,
-  InternalDatabase,
+  type Log,
+  type InternalDatabase,
 } from "@orbitdb/core";
-import type { Helia } from "helia";
-import type { Libp2p } from "libp2p";
+import type { HeliaWithLibp2p } from "@helia/libp2p";
 import type { ServiceMap } from "@libp2p/interface";
 import itAll from "it-all";
-import { getScalePosition } from "./utils.js";
+import { getScalePosition } from "./utils.ts";
 
 export type OrderedKeyValueDatabaseType = Awaited<
   ReturnType<ReturnType<typeof OrderedKeyValue>>
@@ -39,7 +38,7 @@ const OrderedKeyValue =
     onUpdate,
     signal,
   }: {
-    ipfs: Helia<Libp2p<T>>;
+    ipfs: HeliaWithLibp2p<T>;
     identity?: Identity;
     address: string;
     name?: string;
